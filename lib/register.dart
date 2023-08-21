@@ -1,5 +1,8 @@
 import 'package:auth/login.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'successfull.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -11,7 +14,29 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
 
   bool _obscureText = true; // To toggle password visibility
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  void _handleRegister() async {
+    String email = _emailController.text; // Replace with your email controller
+    String password = _passwordController.text; // Replace with your password controller
+
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // Registration successful, navigate to the appropriate screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Welcome()), // Replace with your desired screen
+      );
+    } catch (e) {
+      // Handle registration errors
+      print('Error during registration: $e');
+      // You can also show an error message to the user using a snackbar or similar
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +75,7 @@ class _RegisterState extends State<Register> {
             Padding(
               padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
               child: TextField(
+                style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                     hintText: 'John Doe',
                     hintStyle: const TextStyle(color: Colors.white),
@@ -71,6 +97,8 @@ class _RegisterState extends State<Register> {
             Padding(
               padding: const EdgeInsets.only(top: 10, left: 20, right: 17),
               child: TextField(
+                style: TextStyle(color: Colors.white),
+                controller: _emailController,
                 decoration: InputDecoration(
                     hintText: 'johndoe@gmail.com',
                     hintStyle: const TextStyle(color: Colors.white),
@@ -93,6 +121,7 @@ class _RegisterState extends State<Register> {
             Padding(
               padding: const EdgeInsets.only(top: 10, left: 20, right: 20),
               child: TextField(
+                style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                     hintText: 'Phone number',
                     hintStyle: const TextStyle(color: Colors.white),
@@ -154,19 +183,22 @@ class _RegisterState extends State<Register> {
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.only(top: 30, left: 20, right: 20,),
-              child: Container(
-                width: 365,
-                height: 50,
-                decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent,
-                    borderRadius: BorderRadius.circular(10)
-                ),
-                child: const Center(
-                    child: Text('Register', style: TextStyle(color: Colors.white, fontSize: 20),)
-                ),
+            GestureDetector(
+              onTap: _handleRegister,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 30, left: 20, right: 20,),
+                child: Container(
+                  width: 365,
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: Colors.deepPurpleAccent,
+                      borderRadius: BorderRadius.circular(10)
+                  ),
+                  child: const Center(
+                      child: Text('Register', style: TextStyle(color: Colors.white, fontSize: 20),)
+                  ),
 
+                ),
               ),
             ),
 

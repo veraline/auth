@@ -1,4 +1,7 @@
+import 'package:auth/successfull.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -10,7 +13,35 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
 
   bool _obscureText = true; // To toggle password visibility
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  String  _errorMessage = '';
+
+
+  void _handleLogin() async {
+    String email = _emailController.text; // Replace with your email controller
+    String password = _passwordController.text; // Replace with your password controller
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // Login successful, navigate to the appropriate screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Welcome()), // Replace with your desired screen
+      );
+    } catch (e) {
+      // Handle login errors
+      print('Error during login: $e');
+      setState(() {
+        _errorMessage = 'Wrong email or password'; // Update the error message
+      });
+
+      // You can also show an error message to the user using a snackbar or similar
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,8 +79,9 @@ class _LoginState extends State<Login> {
                 padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
                 child: TextField(
                   style: const  TextStyle(color: Colors.white),
+                  controller: _emailController,
                   decoration: InputDecoration(
-                      hintText: 'John Doe',
+                      hintText: 'email',
                       hintStyle: const TextStyle(color: Colors.white),
                       fillColor: const Color(0xFF222222),
                       filled: true,
@@ -67,15 +99,13 @@ class _LoginState extends State<Login> {
 
 
 
-
-
-
               Padding(
                 padding:  const EdgeInsets.only(top: 10, left: 20, right: 20),
 
                 child: TextField(
                   controller: _passwordController,
-                  obscureText: _obscureText, // Toggle password visibility
+                  obscureText: _obscureText,
+                  // Toggle password visibility
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                       hintText: 'Password',
@@ -112,6 +142,15 @@ class _LoginState extends State<Login> {
                 ),
               ),
 
+              if (_errorMessage.isNotEmpty) // Add this condition
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 5),
+                  child: Text(
+                    _errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+
 
 
               const   Padding(
@@ -120,15 +159,18 @@ class _LoginState extends State<Login> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 30, left: 20, right: 20,),
-                child: Container(
-                  width: 365,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.deepPurpleAccent,
-                      borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: const Center(
-                      child: Text('Login', style: TextStyle(color: Colors.white, fontSize: 20),)
+                child: GestureDetector(
+                  onTap: _handleLogin,
+                  child: Container(
+                    width: 365,
+                    height: 50,
+                    decoration: BoxDecoration(
+                        color: Colors.deepPurpleAccent,
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: const Center(
+                        child: Text('Login', style: TextStyle(color: Colors.white, fontSize: 20),)
+                    ),
                   ),
                 ),
               ),
